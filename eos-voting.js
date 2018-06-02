@@ -2,8 +2,8 @@ var eosVoter = class {
   constructor() {
     this.network = {
      blockchain:'eos',
-     host:'13.71.191.137', 
-     port:8889, 
+     host:'193.93.219.219', 
+     port:8888, 
      chainId:null, 
    }
    this.eos = null;
