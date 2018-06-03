@@ -2,7 +2,7 @@ var eosVoter = class {
   constructor() {
     this.network = {
      blockchain:'eos',
-     host:'193.93.219.219', 
+     host:'dolphin.eosblocksmith.io', 
      port:8888, 
      chainId:null, 
    }
@@ -20,15 +20,21 @@ vote(errorHandler, successHandler) {
   console.log(this.network);
   return scatter.suggestNetwork(this.network).then( (selectedNetwork) => {
     console.log("selectedNetwork", selectedNetwork);
-    
-    return scatter.getIdentity().then(identity => {
+   const requiredFields = {
+    accounts:[
+        {blockchain:'eos', host:'dolphin.eosblocksmith.io', port:8888},
+    ]
+}; 
+    return scatter.getIdentity(requiredFields).then(identity => {
      console.log("identity",identity);
+     if(identity.accounts.length === 0) return
+     var accountName = identity.accounts[0].name;
      this.eos.transaction(tr => {
-      tr.voteproducer(identity.name,"",this.getSelectedBPs());
+//	tr.delegatebw(accountName,accountName,"0.5 SYS","0.5 SYS",0);
+      tr.voteproducer(accountName,"",this.getSelectedBPs());
     });
             //return this.eos.contract('eosio').then(contract => {
               // console.log("contract",contract);        
-              // return contract.newaccount(identity.name,"test1",identity.name,null,null,null)
               // return contract.delegatebw(identity.name,identity.name,net,cpu,"0.0 EOS").then(result=>{
                 //return contract.voteproducer(identity.name,"",this.getSelectedBPs());
               // });
