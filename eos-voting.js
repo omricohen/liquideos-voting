@@ -119,7 +119,7 @@ voteSuccess(res) {
 
         var config = {
           chainId: null, // 32 byte (64 char) hex string
-          httpEndpoint: 'http'+network.port === 443 ? 's' : '' +'://'+network.host+':'+network.port,
+          httpEndpoint: 'http'+ (network.port === 443 ? 's' : '') +'://'+network.host+':'+network.port,
           expireInSeconds: 60,
           broadcast: true,
           debug: false, // API and transactions
