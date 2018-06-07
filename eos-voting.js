@@ -11,7 +11,7 @@ const networks = [
   port:8888
 }
 ]
-const network = networks[0];
+const network = networks[1];
 
 var eosVoter = class {
   constructor() {
@@ -119,13 +119,18 @@ voteSuccess(res) {
         var table;
 
         var config = {
-          chainId: null, // 32 byte (64 char) hex string
-          httpEndpoint: 'http'+ (network.secured ? 's' : '') +'://'+network.host+':'+network.port,
+          chainId: null, // 32 byte (64 char) hex string          
           expireInSeconds: 60,
           broadcast: true,
-          debug: false, // API and transactions
+          debug: true, // API and transactions
           sign: true
         };
+        if(network.secured){
+          config.httpsEndpoint = 'https://'+network.host+':'+network.port;
+        }
+        else{
+          config.httpEndpoint = 'http://'+network.host+':'+network.port;
+        }
 
         this.eosPublic = new Eos.Testnet(config);
         this.populateBPs().then(res=>{ 
@@ -241,7 +246,7 @@ voteSuccess(res) {
     return scatter.suggestNetwork(this.network).then( (selectedNetwork) => {
     console.log("selectedNetwork", selectedNetwork);          
       const requiredFields = {accounts:[{blockchain:'eos', host:network.host, port:network.port}]}; 
-     this.eos = this.scatter.eos( this.network, Eos.Localnet, {}, network.secured ? 'https' : undefined  );
+     this.eos = this.scatter.eos( this.network, Eos.Testnet, {}, network.secured ? 'https' : undefined  );
 
     return scatter.getIdentity(requiredFields).then(identity => {
        console.log("identity",identity);
