@@ -18,34 +18,29 @@ var eosVoter = class {
 
 vote(errorHandler, successHandler) {
   console.log(this.network);
-  return scatter.suggestNetwork(this.network).then( (selectedNetwork) => {
-    console.log("selectedNetwork", selectedNetwork);
-   const requiredFields = {
-    accounts:[
-        {blockchain:'eos', host:'dolphin.eosblocksmith.io', port:8888},
-    ]
-}; 
-    return scatter.getIdentity(requiredFields).then(identity => {
-     console.log("identity",identity);
-     if(identity.accounts.length === 0) return
-     var accountName = identity.accounts[0].name;
-     this.eos.transaction(tr => {
+  document.getElementById("vote_button").disabled = true;
+  this.verifyScatter();
+  this.working = true;
+     return this.eos.transaction(tr => {
 //	tr.delegatebw(accountName,accountName,"0.5 SYS","0.5 SYS",0);
-      tr.voteproducer(accountName,"",this.getSelectedBPs());
-    });
+var accountName = document.getElementById("cleos_name").value;
+      return tr.voteproducer(accountName,"",this.getSelectedBPs());
+    
             //return this.eos.contract('eosio').then(contract => {
               // console.log("contract",contract);        
               // return contract.delegatebw(identity.name,identity.name,net,cpu,"0.0 EOS").then(result=>{
                 //return contract.voteproducer(identity.name,"",this.getSelectedBPs());
               // });
               // 
-          //});
-        });
+          //});  
   }).then(res=>{
+    document.getElementById("vote_button").disabled = false;
     this.voteSuccess(res);
-
+this.working = false;
   }).catch(error => {   
+    document.getElementById("vote_button").disabled = false;
     this.voteError(error);
+    this.working = false;
   });   
 }
 
@@ -55,11 +50,23 @@ getSelectedBPs() {
     if (bp.checked)
       selected.push(bp.value);
   });
+  selected.sort();
+  if(selected.length > 30){
+    var msg = '<div class="alert alert-danger"> Too many block producers in vote (maximum 30)</div>';    
+    document.getElementById("messages").innerHTML = msg;
+    document.getElementById("vote_button").disabled = true;
+  }
+  else{  
+    document.getElementById("messages").innerHTML = '';
+    if(!this.working )
+     document.getElementById("vote_button").disabled = false;
+  }
   return selected;
 }
 
 updateAccountName() {
   document.getElementById("cleos_account").innerHTML = document.getElementById("cleos_name").value;
+  document.getElementById("cleos_account2").innerHTML = document.getElementById("cleos_name").value;
 }
 
 bpClick() {
@@ -83,7 +90,7 @@ voteSuccess(res) {
 
     populateBPs(){
         // populate producer table
-        return this.eos.getTableRows({
+        return this.eosPublic.getTableRows({
           "json": true,
           "scope": 'eosio',
           "code": 'eosio',
@@ -96,8 +103,16 @@ voteSuccess(res) {
         var eosOptions = {};
         var table;
 
-        this.verifyScatter();
-        this.eos = this.scatter.eos( this.network, Eos.Localnet, eosOptions );
+        var config = {
+          chainId: null, // 32 byte (64 char) hex string
+          httpEndpoint: 'http://dolphin.eosblocksmith.io:8888',
+          expireInSeconds: 60,
+          broadcast: true,
+          debug: false, // API and transactions
+          sign: true
+        };
+
+        this.eosPublic = new Eos.Testnet(config);
         this.populateBPs().then(res=>{ 
           this.buildTable(res);
         });
@@ -111,16 +126,15 @@ voteSuccess(res) {
 
       buildTable(res) {
         var table = document.getElementsByTagName('tbody')[0];
-
+        const promoted = 'eosliquideos';
         this.countTotalVotes(res);
-
-        var sorted = res.rows.sort((a,b) => Number(a.total_votes) > Number(b.total_votes) ? -1:1);
+        var sorted = res.rows.sort((a,b) => a.owner === promoted ? -1 : b.owner === promoted ? 1 : Number(a.total_votes) > Number(b.total_votes) ? -1:1);
 
         for (var i = 0; i <sorted.length; i++) {
           var row = sorted[i];
           var tr = document.createElement('tr');
           table.append(tr);
-          tr.append(this.addTd('<input name="bpVote" type="checkbox" value="'+row.owner+'">'));
+          tr.append(this.addTd('<input name="bpVote" type="checkbox" value="'+row.owner+'" '+ (row.owner === promoted ? 'checked' : '') + ' >'));
           tr.append(this.addTd("<a href='"+row.url+"'>"+row.owner+"</a>"));
           tr.append(this.addTd(row.location));     
           tr.append(this.addTd(this.cleanNumber(row.total_votes)));
@@ -206,30 +220,24 @@ voteSuccess(res) {
     else {
       return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
     }
-  } 
-  randomAccountName() {
-                const size = 12;
-                let text = "";
-                const possible = "abcdefghij12345";
-                for(let i=0; i<size; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
-                return text;
-            }
+  }
+  load(){
+     this.verifyScatter();
+    return scatter.suggestNetwork(this.network).then( (selectedNetwork) => {
+    console.log("selectedNetwork", selectedNetwork);          
+      const requiredFields = {accounts:[{blockchain:'eos', host:'dolphin.eosblocksmith.io', port:8888}]}; 
+     this.eos = this.scatter.eos( this.network, Eos.Localnet, {} );
 
-  generateAccount() {
-      var privateKey = "5J1ptNETYoES2YAfVremkrfhMSBV4ivkrYX4LQDTk1J47Gmh5K5";
-      const publicKey = "EOS7hbKJ2U8zicmZLxPe9zfux7HFEsMPH7PuN3Le7mPWNK1hiupPD";
-      return scatter.getIdentity().then(identity => {
-        console.log(identity);
-        this.eos.newaccount({
-          creator: "eosio",
-          name: identity.name,
-          owner: identity.publicKey,
-          active: identity.publicKey
-        }).then(account => {
-          console.log(account);
-        });
-      });
-    }
+    return scatter.getIdentity(requiredFields).then(identity => {
+       console.log("identity",identity);
+       if(identity.accounts.length === 0) return
+       var accountName = identity.accounts[0].name;
+
+     document.getElementById("cleos_name").value = accountName;
+     this.updateAccountName();
+   });
+});
+  }
 }
 
 
@@ -239,6 +247,7 @@ var voter = new eosVoter();
 document.getElementById("vote_button").addEventListener('click', function() {
   voter.vote()
 });
-document.addEventListener('scatterLoaded', scatterExtension => {
-  voter.refreshBPs();
+document.addEventListener('scatterLoaded', scatterExtension => {  
+  voter.load();
 });
+voter.refreshBPs();
