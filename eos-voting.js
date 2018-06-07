@@ -1,8 +1,9 @@
 const networks = [
 {
   name:"Main Net",
-  host:"api.eosn.io",
-  port:443
+  host:"api.eosmetal.io:",
+  port:18890
+  secured: true
 },
 {
   name:"Jungle Testnet",
@@ -119,7 +120,7 @@ voteSuccess(res) {
 
         var config = {
           chainId: null, // 32 byte (64 char) hex string
-          httpEndpoint: 'http'+ (network.port === 443 ? 's' : '') +'://'+network.host+':'+network.port,
+          httpEndpoint: 'http'+ (network.secured ? 's' : '') +'://'+network.host+':'+network.port,
           expireInSeconds: 60,
           broadcast: true,
           debug: false, // API and transactions
@@ -240,7 +241,7 @@ voteSuccess(res) {
     return scatter.suggestNetwork(this.network).then( (selectedNetwork) => {
     console.log("selectedNetwork", selectedNetwork);          
       const requiredFields = {accounts:[{blockchain:'eos', host:network.host, port:network.port}]}; 
-     this.eos = this.scatter.eos( this.network, Eos.Localnet, {} );
+     this.eos = this.scatter.eos( this.network, Eos.Localnet, {}, network.secured ? 'https' : undefined  );
 
     return scatter.getIdentity(requiredFields).then(identity => {
        console.log("identity",identity);
