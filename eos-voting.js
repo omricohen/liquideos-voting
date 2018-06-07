@@ -1,7 +1,7 @@
 const networks = [
 {
   name:"Main Net",
-  host:"node.eosflare.io",
+  host:"api.main.alohaeos.com",
   port:443,
   secured: true
 },
