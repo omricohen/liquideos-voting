@@ -1,8 +1,8 @@
 const networks = [
 {
   name:"Main Net",
-  host:"mainnet.genereos.io",
-  port:80
+  host:"api.eosn.io",
+  port:443
 },
 {
   name:"Jungle Testnet",
@@ -119,7 +119,7 @@ voteSuccess(res) {
 
         var config = {
           chainId: null, // 32 byte (64 char) hex string
-          httpEndpoint: 'http://'+network.host+':'+network.port,
+          httpEndpoint: 'http'+network.port === 443 ? 's' : '' +'://'+network.host+':'+network.port,
           expireInSeconds: 60,
           broadcast: true,
           debug: false, // API and transactions
