@@ -10,7 +10,7 @@ const networks = [
   port:8888
 }
 ]
-const network = networks[1];
+const network = networks[0];
 
 var eosVoter = class {
   constructor() {
