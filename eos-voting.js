@@ -1,9 +1,23 @@
+const networks = [
+{
+  name:"Main Net",
+  host:"mainnet.genereos.io",
+  port:80
+},
+{
+  name:"Jungle Testnet",
+  host:"dolphin.eosblocksmith.io",
+  port:8888
+}
+]
+const network = networks[1];
+
 var eosVoter = class {
   constructor() {
     this.network = {
      blockchain:'eos',
-     host:'dolphin.eosblocksmith.io', 
-     port:8888, 
+     host:network.host, 
+     port:network.port, 
      chainId:null, 
    }
    this.eos = null;
@@ -105,7 +119,7 @@ voteSuccess(res) {
 
         var config = {
           chainId: null, // 32 byte (64 char) hex string
-          httpEndpoint: 'http://dolphin.eosblocksmith.io:8888',
+          httpEndpoint: 'http://'+network.host+':'+network.port,
           expireInSeconds: 60,
           broadcast: true,
           debug: false, // API and transactions
@@ -225,7 +239,7 @@ voteSuccess(res) {
      this.verifyScatter();
     return scatter.suggestNetwork(this.network).then( (selectedNetwork) => {
     console.log("selectedNetwork", selectedNetwork);          
-      const requiredFields = {accounts:[{blockchain:'eos', host:'dolphin.eosblocksmith.io', port:8888}]}; 
+      const requiredFields = {accounts:[{blockchain:'eos', host:network.host, port:network.port}]}; 
      this.eos = this.scatter.eos( this.network, Eos.Localnet, {} );
 
     return scatter.getIdentity(requiredFields).then(identity => {
