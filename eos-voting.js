@@ -10,8 +10,21 @@ const networks = [
   host:"dolphin.eosblocksmith.io",
   port:8888
 }
-]
-const network = networks[1];
+];
+var defaultIndex = 1;
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+var networkParam = getParameterByName('network');
+if(networkParam)
+  defaultIndex = networkParam;
+const network = networks[defaultIndex];
 
 var eosVoter = class {
   constructor() {
@@ -36,10 +49,13 @@ vote(errorHandler, successHandler) {
   document.getElementById("vote_button").disabled = true;
   this.verifyScatter();
   this.working = true;
-     return this.eos.transaction(tr => {
+     // return this.eos.transaction(tr => {
 //	tr.delegatebw(accountName,accountName,"0.5 SYS","0.5 SYS",0);
 var accountName = document.getElementById("cleos_name").value;
-      return tr.voteproducer(accountName,"",this.getSelectedBPs());
+return this.eos.contract('eosio').then(contract => {
+    return contract.voteproducer(accountName,"",this.getSelectedBPs());
+
+      // return tr.voteproducer(accountName,"",this.getSelectedBPs());
     
             //return this.eos.contract('eosio').then(contract => {
               // console.log("contract",contract);        
@@ -247,7 +263,7 @@ voteSuccess(res) {
     console.log("selectedNetwork", selectedNetwork);          
       const requiredFields = {accounts:[{blockchain:'eos', host:network.host, port:network.port}]}; 
      this.eos = this.scatter.eos( this.network, Eos.Testnet, {}, network.secured ? 'https' : undefined  );
-
+scatter.authenticate().then(()=>{
     return scatter.getIdentity(requiredFields).then(identity => {
        console.log("identity",identity);
        if(identity.accounts.length === 0) return
@@ -256,6 +272,7 @@ voteSuccess(res) {
      document.getElementById("cleos_name").value = accountName;
      this.updateAccountName();
    });
+  });
 });
   }
 }
