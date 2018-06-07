@@ -1,8 +1,8 @@
 const networks = [
 {
   name:"Main Net",
-  host:"api.eosmetal.io:",
-  port:18890
+  host:"node.eosflare.io",
+  port:443
   secured: true
 },
 {
