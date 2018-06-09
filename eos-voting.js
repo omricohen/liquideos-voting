@@ -34,10 +34,7 @@ var eosVoter = class {
      host:network.host, 
      port:network.port, 
      chainId:network.chainId, 
-     expireInSeconds: 60,
-    broadcast: true,
-    debug: false, // API and transactions
-    sign: true
+     expireInSeconds: 120,
    }
    this.eos = null;
    document.getElementById("cleos_name").onkeyup = this.updateAccountName;
