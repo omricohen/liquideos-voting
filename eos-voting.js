@@ -103,7 +103,7 @@ bpClick() {
 voteSuccess(res) {
       //otodo
       console.log(res);
-      var msg = '<div class="alert alert-success">' + res.message + '</div>';
+      var msg = '<div class="alert alert-success">' + "Vote Successfully Submitted" + '</div>';
       document.getElementById("messages").innerHTML = msg;
     }
 
