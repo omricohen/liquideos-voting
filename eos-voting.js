@@ -261,7 +261,7 @@ voteSuccess(res) {
     console.log("selectedNetwork", selectedNetwork);          
       const requiredFields = {accounts:[{blockchain:'eos', host:network.host, port:network.port}]}; 
      this.eos = this.scatter.eos( this.network, Eos.Testnet, {}, network.secured ? 'https' : undefined  );
-scatter.authenticate().then(()=>{
+//scatter.authenticate().then(()=>{
     return scatter.getIdentity(requiredFields).then(identity => {
        console.log("identity",identity);
        if(identity.accounts.length === 0) return
@@ -270,7 +270,7 @@ scatter.authenticate().then(()=>{
      document.getElementById("cleos_name").value = accountName;
      this.updateAccountName();
    });
-  });
+//  });
 });
   }
 }
