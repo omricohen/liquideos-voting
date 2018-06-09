@@ -8,6 +8,7 @@ const networks = [
 {
   name:"Jungle Testnet",
   host:"dolphin.eosblocksmith.io",
+  // chainId:"7d47aae09c97dbc21d52c6d9f17bb70a1f1f2fda5f81b3ef18979b74b2070d8c",
   port:8888
 }
 ];
@@ -32,7 +33,11 @@ var eosVoter = class {
      blockchain:'eos',
      host:network.host, 
      port:network.port, 
-     chainId:null, 
+     chainId:network.chainId, 
+     expireInSeconds: 60,
+    broadcast: true,
+    debug: false, // API and transactions
+    sign: true
    }
    this.eos = null;
    document.getElementById("cleos_name").onkeyup = this.updateAccountName;
@@ -49,21 +54,14 @@ vote(errorHandler, successHandler) {
   document.getElementById("vote_button").disabled = true;
   this.verifyScatter();
   this.working = true;
-     // return this.eos.transaction(tr => {
+     return this.eos.transaction(tr => {
 //	tr.delegatebw(accountName,accountName,"0.5 SYS","0.5 SYS",0);
 var accountName = document.getElementById("cleos_name").value;
-return this.eos.contract('eosio').then(contract => {
-    return contract.voteproducer(accountName,"",this.getSelectedBPs());
+// return this.eos.contract('eosio').then(contract => {
+    // return contract.voteproducer(accountName,"",this.getSelectedBPs());
 
-      // return tr.voteproducer(accountName,"",this.getSelectedBPs());
-    
-            //return this.eos.contract('eosio').then(contract => {
-              // console.log("contract",contract);        
-              // return contract.delegatebw(identity.name,identity.name,net,cpu,"0.0 EOS").then(result=>{
-                //return contract.voteproducer(identity.name,"",this.getSelectedBPs());
-              // });
-              // 
-          //});  
+      return tr.voteproducer(accountName,"",this.getSelectedBPs());
+
   }).then(res=>{
     document.getElementById("vote_button").disabled = false;
     this.voteSuccess(res);
