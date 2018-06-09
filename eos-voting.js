@@ -1,16 +1,17 @@
 const networks = [
-{
-  name:"Main Net",
-  host:"mainnet.genereos.io",
-  port:80,
-  secured: false
-},
-{
-  name:"Jungle Testnet",
-  host:"dolphin.eosblocksmith.io",
-  // chainId:"7d47aae09c97dbc21d52c6d9f17bb70a1f1f2fda5f81b3ef18979b74b2070d8c",
-  port:8888
-}
+    {
+        name: "Main Net",
+        host: "node2.liquideos.com",
+        port: 8888,
+        chainId: "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
+        secured: false
+    },
+    {
+        name: "Jungle Testnet",
+        host: "dolphin.eosblocksmith.io",
+        chainId: "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca",
+        port: 8888
+    }
 ];
 var defaultIndex = 1;
 function getParameterByName(name, url) {
@@ -130,11 +131,8 @@ voteSuccess(res) {
         var table;
 
         var config = {
-          chainId: null, // 32 byte (64 char) hex string          
+          chainId: network.chainId, // 32 byte (64 char) hex string          
           expireInSeconds: 60,
-          broadcast: true,
-          debug: true, // API and transactions
-          sign: true
         };
         if(network.secured){
           config.httpsEndpoint = 'https://'+network.host+':'+network.port;
@@ -143,7 +141,7 @@ voteSuccess(res) {
           config.httpEndpoint = 'http://'+network.host+':'+network.port;
         }
 
-        this.eosPublic = new Eos.Testnet(config);
+        this.eosPublic = new Eos(config);
         this.populateBPs().then(res=>{ 
           this.buildTable(res);
         });
@@ -257,7 +255,7 @@ voteSuccess(res) {
     return scatter.suggestNetwork(this.network).then( (selectedNetwork) => {
     console.log("selectedNetwork", selectedNetwork);          
       const requiredFields = {accounts:[{blockchain:'eos', host:network.host, port:network.port}]}; 
-     this.eos = this.scatter.eos( this.network, Eos.Testnet, {}, network.secured ? 'https' : undefined  );
+     this.eos = this.scatter.eos( this.network, Eos, {}, network.secured ? 'https' : undefined  );
 //scatter.authenticate().then(()=>{
     return scatter.getIdentity(requiredFields).then(identity => {
        console.log("identity",identity);
