@@ -1,9 +1,9 @@
 const networks = [
 {
   name:"Main Net",
-  host:"api.main.alohaeos.com",
-  port:443,
-  secured: true
+  host:"mainnet.genereos.io",
+  port:80,
+  secured: false
 },
 {
   name:"Jungle Testnet",
